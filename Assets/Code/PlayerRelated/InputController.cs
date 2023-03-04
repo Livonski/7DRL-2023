@@ -19,10 +19,9 @@ public class InputController : MonoBehaviour
 
         if (Mathf.Abs(x) > 0 | Mathf.Abs(y) > 0)
         {
-            Debug.Log(x + " " + y);
-            Vector3Int moveDirection = new Vector3Int(x,0, y);
+            //Debug.Log(x + " " + y);
+            Vector3Int moveDirection = new Vector3Int(x, 0, y);
             StartCoroutine(movable.Move(moveDirection));
-            //movable.Move(moveDirection);
         }
     }
 }
