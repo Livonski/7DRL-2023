@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Unwalkable
   - Entity
+  - Walkable
   layers:
   - Default
   - TransparentFX

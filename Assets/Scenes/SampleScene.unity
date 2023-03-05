@@ -311,6 +311,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1366781339}
   - component: {fileID: 1366781340}
+  - component: {fileID: 1366781341}
+  - component: {fileID: 1366781343}
+  - component: {fileID: 1366781342}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -345,7 +348,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f356cf91292f572459305e7239a8b181, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: {x: 11, y: 11}
+  gridSize: {x: 50, y: 50}
+  offset: {x: 3, y: 3}
   player: {fileID: 5704691759902616963, guid: 0302c7d615b441a40b6b256385e33c85, type: 3}
   dummy: {fileID: 1979709172140345770, guid: 0d2082614934d5c499f788665d22aeec, type: 3}
   testObject: {fileID: 3263886121874243667, guid: 72d18cdd580f74b4893a70010f1adf9e, type: 3}
+--- !u!114 &1366781341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1366781335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4292421738ebc74eaddd3c49009fd1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomSize: {x: 5, y: 7}
+  amountOfRooms: {x: 5, y: 10}
+  amountOfCorridors: {x: 3, y: 6}
+  tiles:
+  - {fileID: 6435775446534484191, guid: 99bc016b388187344a398b9a28651480, type: 3}
+  - {fileID: 3263886121874243667, guid: 72d18cdd580f74b4893a70010f1adf9e, type: 3}
+  - {fileID: 3429080155701238199, guid: e250638efbc207a4bbfb894f40b57f9e, type: 3}
+--- !u!114 &1366781342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1366781335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95bdbbf0437b72d499fd9e9f59f175d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _grid: {fileID: 1366781340}
+--- !u!114 &1366781343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1366781335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03bc37461d32c964c89f081073bf186f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

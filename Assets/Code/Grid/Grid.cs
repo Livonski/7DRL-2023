@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -7,37 +8,26 @@ public class Grid : MonoBehaviour
 {
     private GameObject[,] tiles;
     [SerializeField] private Vector2Int gridSize;
+    [SerializeField] private Vector2Int offset;
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject dummy;
     [SerializeField] private GameObject testObject;
 
+    private worldGenerator worldGenerator;
     private Node[,] grid;
     private Vector3 worldBottomLeft;
 
     private void Start()
     {
-        Vector3 worldBottomLeft = transform.position - Vector3.right * gridSize.x / 2 - Vector3.forward * gridSize.y / 2;
+        worldBottomLeft = transform.position - Vector3.right * gridSize.x / 2 - Vector3.forward * gridSize.y / 2;
+        worldGenerator = GetComponent<worldGenerator>();
+
+        tiles = worldGenerator.GenerateWorld(gridSize, worldBottomLeft, offset);
         CreateGrid();
-        tiles = new GameObject[gridSize.x, gridSize.y];
-        GenerateWorldGrid(testObject);
-        AddObject(new Vector2Int(1, 1), player);
-        AddObject(new Vector2Int(4, 8), dummy);
-    }
 
-    private void GenerateWorldGrid(GameObject defaultTile)
-    {
-        for (int y= 0; y < gridSize.y; y++)
-        {
-            for(int x= 0; x < gridSize.x; x++)
-            {
-                GameObject newTile = Instantiate(defaultTile);
-                newTile.transform.position = worldBottomLeft + transform.position + new Vector3(x, 0, y);
-                newTile.name = "Tile " + x + " " + y;
-                newTile.transform.parent = transform;
-
-                tiles[x, y] = newTile;
-            }
-        }
+        worldGenerator.GenerateCorridors();
+        //AddObject(new Vector2Int(1, 1), player);
+        //AddObject(new Vector2Int(4, 8), dummy);
     }
     private void CreateGrid()
     {
@@ -47,9 +37,13 @@ public class Grid : MonoBehaviour
         {
             for (int x = 0; x < gridSize.x; x++)
             {
-                //Vector3 worldPoint = worldBottomLeft + Vector3.right * x + Vector3.forward * y;
                 Vector3 worldPoint = worldBottomLeft + transform.position + new Vector3(x, 0, y);
                 bool walkable = true;
+                if (tiles[x, y] != null && tiles[x,y].tag == "Unwalkable")
+                {
+                    walkable = false;
+                }
+
                 grid[x, y] = new Node(walkable, worldPoint, new Vector2(x, y));
             }
         }
@@ -101,9 +95,12 @@ public class Grid : MonoBehaviour
     public Node NodeFromWorldPoint(Vector3 worldPosition)
     {
         int x = (int)(worldPosition.x - worldBottomLeft.x);
-        int y = (int)(worldPosition.z - worldBottomLeft.y);
-
-        return grid[x, y];
+        int y = (int)(worldPosition.z - worldBottomLeft.z);
+        //Debug.Log(worldPosition.x + ":" + worldPosition.z);
+        //Debug.Log(x + ":" + y);
+        if (grid[x, y] != null)
+            return grid[x, y];
+        return null;
     }
 
     public List<Node> GetNeighbours(Node node)
@@ -115,6 +112,8 @@ public class Grid : MonoBehaviour
             for (int y = -1; y <= 1; y++)
             {
                 if (x == 0 && y == 0)
+                    continue;
+                if (Mathf.Abs(x) == 1 && Mathf.Abs(y) == 1)
                     continue;
 
                 int checkX = node.GetGridPosition('x') + x;
@@ -130,11 +129,8 @@ public class Grid : MonoBehaviour
         return neighbours;
     }
 
-
     private void OnDrawGizmos()
     {
-        //Gizmos.DrawWireCube(transform.position, gridSize);
-
         if (grid != null)
         {
             foreach (Node n in grid)
