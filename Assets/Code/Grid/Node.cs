@@ -52,6 +52,11 @@ public class Node : IHeapItem<Node>
         return Mathf.FloorToInt(_gridPosition.y);
     }
 
+    public void setWalkable(bool walkable)
+    {
+        _walkable = walkable;
+    }
+
     public Vector3 GetWorldPosion()
     {
         return _worldPosition;

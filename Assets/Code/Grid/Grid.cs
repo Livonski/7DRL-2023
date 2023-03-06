@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -26,6 +27,8 @@ public class Grid : MonoBehaviour
         CreateGrid();
 
         worldGenerator.GenerateCorridors();
+
+        //updateUnwalkables();
         //AddObject(new Vector2Int(1, 1), player);
         //AddObject(new Vector2Int(4, 8), dummy);
     }
@@ -47,6 +50,24 @@ public class Grid : MonoBehaviour
                 grid[x, y] = new Node(walkable, worldPoint, new Vector2(x, y));
             }
         }
+    }
+
+    private void updateUnwalkables()
+    {
+        for (int y = 0; y < gridSize.y; y++)
+        {
+            for (int x = 0; x < gridSize.x; x++)
+            {
+                bool walkable = true;
+                if (tiles[x, y] != null && tiles[x, y].tag == "Unwalkable")
+                {
+                    walkable = false;
+                }
+                grid[x, y].setWalkable(walkable);
+            }
+        }
+        //yield return new WaitForSeconds(1f);
+        //yield return null;
     }
 
     private void AddObject(Vector2Int position, GameObject newGridObject)

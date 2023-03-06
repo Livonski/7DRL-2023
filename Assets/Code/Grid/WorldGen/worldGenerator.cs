@@ -88,6 +88,11 @@ public class worldGenerator : MonoBehaviour
                         {
                             tileID = 1;
                         }
+                        if (rooms.Last<Room>().doorCount() == 0 && y == leftBottomCorner.y + roomHeight && x == leftBottomCorner.x + roomWidth - 1)
+                        {
+                            Debug.Log("Your shitcode somehow worked");
+                            tileID = 2;
+                        }
                         addTile(tilePosition, tiles[tileID]);
                     }
                 }
@@ -102,6 +107,8 @@ public class worldGenerator : MonoBehaviour
         
         for (int i = 0; i < rooms.Count; i++)
         {
+            //List<Room> otherRooms = rooms;
+            //otherRooms.Remove(rooms[i]);
             for (int j = 0; j < rooms[i].doorCount(); j++)
             {
                 if (doorsWithCorridors.Contains(rooms[i].GetDoor(j)))
@@ -112,12 +119,16 @@ public class worldGenerator : MonoBehaviour
                 bool foundDoor = false;
                 int counter = 0;
 
-                while (!foundDoor && counter < 100)
+                while (!foundDoor && counter < 1000)
                 {
                     counter++;
                     int RandomRoom = Random.Range(0, rooms.Count() - 1);
                     if (RandomRoom == i)
                         continue;
+
+                    if (rooms[RandomRoom].doorCount() == 0)
+                        continue;
+                        
 
                     int RandomDoor = Random.Range(0, rooms[RandomRoom].doorCount());
                     if (!doorsWithCorridors.Contains(rooms[RandomRoom].GetDoor(RandomDoor)))
@@ -134,16 +145,32 @@ public class worldGenerator : MonoBehaviour
                         foundDoor = false;
                     }
 
-                    if (doors.Count <= 1 && !foundDoor)
+                    if (!foundDoor && counter == 1000)
                     {
-                        PathRequestManager.RequestPath(TileToWorldPos(rooms[i].GetDoor(j)), TileToWorldPos(rooms[RandomRoom].GetDoor(RandomDoor)), OnPathFound);
+                        //Debug.Log("Last standing door");
+                        RandomDoor = Random.Range(0, doorsWithCorridors.Count);
+                        PathRequestManager.RequestPath(TileToWorldPos(rooms[i].GetDoor(j)), TileToWorldPos(doorsWithCorridors[RandomDoor]), OnPathFound);
                         foundDoor = true;
                         doorsWithCorridors.Add(rooms[i].GetDoor(j));
-                        doorsWithCorridors.Add(rooms[RandomRoom].GetDoor(RandomDoor));
+                        //doorsWithCorridors.Add(rooms[RandomRoom].GetDoor(RandomDoor));
                         doors.Remove(rooms[i].GetDoor(j));
-                        doors.Remove(rooms[RandomRoom].GetDoor(RandomDoor));
+                        //doors.Remove(rooms[RandomRoom].GetDoor(RandomDoor));
                     }
+                    if (doors.Count == 0)
+                    {
+                        Debug.Log("Last standing door");
+                        RandomDoor = Random.Range(0, doorsWithCorridors.Count);
+                        PathRequestManager.RequestPath(TileToWorldPos(rooms[i].GetDoor(j)), TileToWorldPos(doorsWithCorridors[RandomDoor]), OnPathFound);
+                        foundDoor = true;
+                        doorsWithCorridors.Add(rooms[i].GetDoor(j));
+                        //doorsWithCorridors.Add(rooms[RandomRoom].GetDoor(RandomDoor));
+                        doors.Remove(rooms[i].GetDoor(j));
+                        //doors.Remove(rooms[RandomRoom].GetDoor(RandomDoor));
+                    }
+
                 }
+                if (counter >= 1000)
+                    Debug.Log("opsie can't find doors to connect");
             }
         }
     }
@@ -244,7 +271,8 @@ public class worldGenerator : MonoBehaviour
         if (world[(int)position.x, (int)position.z] == null)
         {
             GameObject newTile = Instantiate(tileType);
-            newTile.transform.position = worldBottomLeft + transform.position + position;
+            Vector3 offsetY = new Vector3(0, tileType.transform.position.y, 0);
+            newTile.transform.position = worldBottomLeft + transform.position + position + offsetY;
             newTile.name = "Tile " + position.x + " " + position.z;
             newTile.transform.parent = transform;
 
@@ -294,7 +322,7 @@ public class Room
         if (ID < doors.Count)
             return doors[ID];
         else
-            throw new System.Exception("Door ID out of range " + ID);
+            throw new System.Exception("Door ID out of range " + ID + " " + doors.Count);
     }
 
     public void addDoor(Vector3Int door)
