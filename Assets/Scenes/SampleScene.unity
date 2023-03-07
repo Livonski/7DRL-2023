@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 522a8300e10ec1f4596932e36b78e51c, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.17276844, g: 0.21589246, b: 0.2978263, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -294,14 +294,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 6, y: 8, z: 0}
-  m_LocalScale: {x: 2, y: 1.2500001, z: 1.7499999}
+  m_LocalRotation: {x: 0.5735764, y: 0, z: 0, w: 0.8191521}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 70, y: 0, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -411,7 +411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: {x: 50, y: 50}
   offset: {x: 3, y: 3}
-  player: {fileID: 5704691759902616963, guid: 0302c7d615b441a40b6b256385e33c85, type: 3}
+  playerPrefab: {fileID: 5704691759902616963, guid: 0302c7d615b441a40b6b256385e33c85, type: 3}
   dummy: {fileID: 1979709172140345770, guid: 0d2082614934d5c499f788665d22aeec, type: 3}
   testObject: {fileID: 3263886121874243667, guid: 72d18cdd580f74b4893a70010f1adf9e, type: 3}
 --- !u!114 &1366781341
@@ -433,7 +433,7 @@ MonoBehaviour:
   - {fileID: 6435775446534484191, guid: 99bc016b388187344a398b9a28651480, type: 3}
   - {fileID: 3263886121874243667, guid: 72d18cdd580f74b4893a70010f1adf9e, type: 3}
   - {fileID: 3429080155701238199, guid: e250638efbc207a4bbfb894f40b57f9e, type: 3}
-  - {fileID: 9076255781642497537, guid: 9ee4358493731c24f8f65e26192a35a0, type: 3}
+  - {fileID: 70652783487593814, guid: 1ef9848c3d9024e40b16fce5c9026fed, type: 3}
 --- !u!114 &1366781342
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -30,8 +30,13 @@ public class Movable : MonoBehaviour
             GameObject targetTile = grid.GetTile(currentPosition + direction);
             if (targetTile != null)
             {
+                Debug.Log(targetTile.transform.tag);
+                if(targetTile.transform.tag == "Unwalkable")
+                    pathClear = false;
+
                 for (int i = 0; i < targetTile.transform.childCount; i++)
                 {
+                    Debug.Log(targetTile.transform.tag);
                     if (targetTile.transform.GetChild(i).tag == "Unwalkable" | targetTile.transform.GetChild(i).tag == "Entity")
                     {
                         pathClear = false;

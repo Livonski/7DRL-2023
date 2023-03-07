@@ -1,4 +1,5 @@
 //using System;
+using Newtonsoft.Json.Bson;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
@@ -24,8 +25,6 @@ public class worldGenerator : MonoBehaviour
     private List<Vector3Int> doors;
     private List<Vector3> corridors;
 
-    private Queue<IEnumerator> coroutineQueue;
-
     public GameObject[,] GenerateWorld(Vector2Int gridSize, Vector3 gridBottomLeft, Vector2Int offset)
     {
         worldBottomLeft = gridBottomLeft;
@@ -50,7 +49,6 @@ public class worldGenerator : MonoBehaviour
             int roomWidth  = Random.Range(roomSize.x, roomSize.y);
             int roomHeight = Random.Range(roomSize.x, roomSize.y);
             int doorsToPlace = Random.Range(amountOfCorridors.x, amountOfCorridors.y);
-            //Debug.Log("Room contains " + doorsToPlace);
             int doorsPlaced = 0;
 
             Vector2Int leftBottomCorner = new Vector2Int(Random.Range(worldOffset.x, worldSize.x - roomWidth - worldOffset.x), Random.Range(worldOffset.y, worldSize.y - roomHeight - worldOffset.y));
@@ -59,7 +57,7 @@ public class worldGenerator : MonoBehaviour
 
             if (couldPlaceRoom(roomWidth, roomHeight, leftBottomCorner))
             {
-                Room room = new Room();
+                Room room = new Room(leftBottomCorner, roomHeight, roomWidth);
                 for (int y = leftBottomCorner.y; y <= leftBottomCorner.y + roomHeight; y++)
                 {
                     for (int x = leftBottomCorner.x; x <= leftBottomCorner.x + roomWidth; x++)
@@ -108,31 +106,16 @@ public class worldGenerator : MonoBehaviour
         }
     }
 
-    public bool GenerateCorridors()
+    public void GenerateCorridors()
     {
-        Queue corridorsGeneration = new Queue();
         List<Room> roomsCopy = rooms.ToList<Room>();
         List<Vector3Int> doorsWithCorridors = new List<Vector3Int>();
         List<Room> unaccesibleRooms = rooms;
         List<Room> accesibleRooms = new List<Room>();
 
-        //Debug.Log(rooms.Count<Room>()); 
-        //Debug.Log(rooms.Capacity); 
-        //for (int i = rooms.Count - 1; i >= 0; i--)
         foreach (Room r in roomsCopy)
         {
-            //Debug.Log("i: " + i);
-            //Room currentRoom = new Room();
-            //Room currentRoom = rooms.ElementAt<Room>(i);
-            //if (rooms.ElementAt<Room>(i) != null)
-            //{
             Room currentRoom = r;
-            //}
-            //else
-            //{
-                //Debug.Log("oopsie");
-            //    continue;
-            //}
                 
             for (int j = 0; j < currentRoom.doorCount(); j++)
             {
@@ -166,84 +149,10 @@ public class worldGenerator : MonoBehaviour
                     accesibleRooms.Add(currentRoom);
                     unaccesibleRooms.Remove(currentRoom);
                 }
-                //corridorsGeneration.Enqueue(PathRequestManager.RequestPath(TileToWorldPos(startRoom), TileToWorldPos(endRoom), OnPathFound));
                 PathRequestManager.RequestPath(TileToWorldPos(startRoom), TileToWorldPos(endRoom), OnPathFound);
             }
         } 
-
-        for (int i = 0; i < corridorsGeneration.Count; i++)
-        {
-            corridorsGeneration.Dequeue();
-        }
-        /*for (int i = 0; i < rooms.Count; i++)
-        {
-            //List<Room> otherRooms = rooms;
-            //otherRooms.Remove(rooms[i]);
-            for (int j = 0; j < rooms[i].doorCount(); j++)
-            {
-                if (doorsWithCorridors.Contains(rooms[i].GetDoor(j)))
-                    continue;
-
-                Debug.Log("doors without corridors " + doors.Count + ", doors with corridors " + doorsWithCorridors.Count);
-
-                bool foundDoor = false;
-                int counter = 0;
-
-                while (!foundDoor && counter < 1000)
-                {
-                    counter++;
-                    int RandomRoom = Random.Range(0, rooms.Count() - 1);
-                    if (RandomRoom == i)
-                        continue;
-
-                    if (rooms[RandomRoom].doorCount() == 0)
-                        continue;
-
-
-                    int RandomDoor = Random.Range(0, rooms[RandomRoom].doorCount());
-                    if (!doorsWithCorridors.Contains(rooms[RandomRoom].GetDoor(RandomDoor)))
-                    {
-                        PathRequestManager.RequestPath(TileToWorldPos(rooms[i].GetDoor(j)), TileToWorldPos(rooms[RandomRoom].GetDoor(RandomDoor)), OnPathFound);
-                        foundDoor = true;
-                        doorsWithCorridors.Add(rooms[i].GetDoor(j));
-                        doorsWithCorridors.Add(rooms[RandomRoom].GetDoor(RandomDoor));
-                        doors.Remove(rooms[i].GetDoor(j));
-                        doors.Remove(rooms[RandomRoom].GetDoor(RandomDoor));
-                    }
-                    else
-                    {
-                        foundDoor = false;
-                    }
-
-                    if (!foundDoor && counter == 1000)
-                    {
-                        //Debug.Log("Last standing door");
-                        RandomDoor = Random.Range(0, doorsWithCorridors.Count);
-                        PathRequestManager.RequestPath(TileToWorldPos(rooms[i].GetDoor(j)), TileToWorldPos(doorsWithCorridors[RandomDoor]), OnPathFound);
-                        foundDoor = true;
-                        doorsWithCorridors.Add(rooms[i].GetDoor(j));
-                        //doorsWithCorridors.Add(rooms[RandomRoom].GetDoor(RandomDoor));
-                        doors.Remove(rooms[i].GetDoor(j));
-                        //doors.Remove(rooms[RandomRoom].GetDoor(RandomDoor));
-                    }
-                    if (doors.Count == 0)
-                    {
-                        Debug.Log("Last standing door");
-                        RandomDoor = Random.Range(0, doorsWithCorridors.Count);
-                        PathRequestManager.RequestPath(TileToWorldPos(rooms[i].GetDoor(j)), TileToWorldPos(doorsWithCorridors[RandomDoor]), OnPathFound);
-                        foundDoor = true;
-                        doorsWithCorridors.Add(rooms[i].GetDoor(j));
-                        //doorsWithCorridors.Add(rooms[RandomRoom].GetDoor(RandomDoor));
-                        doors.Remove(rooms[i].GetDoor(j));
-                        //doors.Remove(rooms[RandomRoom].GetDoor(RandomDoor));
-                    }
-
-                }
-                if (counter >= 1000)
-                    Debug.Log("opsie can't find doors to connect");
-            }
-        }*/
-        return true;
+        rooms = roomsCopy.ToList<Room>();
     }
 
 
@@ -285,13 +194,10 @@ public class worldGenerator : MonoBehaviour
         {
             Debug.Log("path found");
             StartCoroutine(addPath(newPath));
-            //coroutineQueue.Enqueue(addPath(newPath));
-            //return true;
         }
         else
         {
             Debug.Log("path not found");
-            //return false;
         }
     }
 
@@ -379,15 +285,57 @@ public class worldGenerator : MonoBehaviour
 
         return new Vector3(x, 0, y);
     }
+
+    public Vector2Int defineStartAndExit()
+    {
+        List<Room> roomsCopy = rooms.ToList<Room>();
+        int randomRoom = Random.Range(0, roomsCopy.Count);
+        Room startRoom = roomsCopy[randomRoom];
+        Room endRoom = findFarrest(roomsCopy, startRoom);  
+
+        addExit(endRoom, tiles[3]);
+
+        return startRoom.randomPosition();
+    }
+    private void addExit(Room endRoom, GameObject exit)
+    {
+
+    }
+
+    private Room findFarrest(List<Room> rooms, Room room)
+    {
+        float maxDistance = 0;
+        Room farrestRoom = null;
+        foreach (Room r in rooms)
+        {
+            if (r != room)
+            {
+                float distance = Vector2Int.Distance(r.origin(), room.origin());
+                if (maxDistance < distance)
+                {
+                    maxDistance = distance;
+                    farrestRoom = r;    
+                }
+            }
+        }
+        return farrestRoom;
+    }
+
 }
 
 public class Room
 {
     private List<Vector3Int> doors;
+    private Vector2Int leftBottomCorner;
+    private int height;
+    private int width;
 
-    public Room()
+    public Room(Vector2Int leftBottomCorner, int height, int width)
     {
         doors = new List<Vector3Int>();
+        this.leftBottomCorner = leftBottomCorner;
+        this.height = height;
+        this.width = width;
     }
 
     public Vector3Int GetDoor(int ID)
@@ -415,5 +363,18 @@ public class Room
     public int doorCount()
     {
         return doors.Count;
+    }
+
+    public Vector2Int origin()
+    {
+        return leftBottomCorner;
+    }
+
+    public Vector2Int randomPosition()
+    {
+        int x = Random.Range(leftBottomCorner.x, leftBottomCorner.x + width);
+        int y = Random.Range(leftBottomCorner.y, leftBottomCorner.y + height);
+
+        return new Vector2Int(x, y);
     }
 }

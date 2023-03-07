@@ -10,7 +10,7 @@ public class Grid : MonoBehaviour
     private GameObject[,] tiles;
     [SerializeField] private Vector2Int gridSize;
     [SerializeField] private Vector2Int offset;
-    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject dummy;
     [SerializeField] private GameObject testObject;
 
@@ -20,28 +20,31 @@ public class Grid : MonoBehaviour
     private Node[,] grid;
     private Vector3 worldBottomLeft;
 
+    private bool unwalkablesUpdated = false;
     private void Start()
     {
         worldBottomLeft = transform.position - Vector3.right * gridSize.x / 2 - Vector3.forward * gridSize.y / 2;
         worldGenerator = GetComponent<worldGenerator>();
 
-        //tiles = worldGenerator.GenerateWorld(gridSize, worldBottomLeft, offset);
-        //worldGenerator.GenerateCorridors();
+        tiles = worldGenerator.GenerateWorld(gridSize, worldBottomLeft, offset);
+        CreateGrid();
+        worldGenerator.GenerateCorridors();
 
-        grid = new Node[gridSize.x, gridSize.y];
+        AddObject(worldGenerator.defineStartAndExit(), playerPrefab);
+        GameObject player = GameObject.Find("Player(Clone)");
+        Camera.main.transform.SetParent(player.transform);
+        Camera.main.transform.position = player.transform.position + new Vector3(0, 15, -5);
 
-        generatorQueue.Enqueue(tiles = worldGenerator.GenerateWorld(gridSize, worldBottomLeft, offset));
-        generatorQueue.Enqueue(grid = CreateGrid());
-        generatorQueue.Enqueue(worldGenerator.GenerateCorridors());
-        //generatorQueue.Enqueue(AddObject(new Vector2Int(1, 1), player));
-
-       StartCoroutine(updateUnwalkables());
-        //AddObject(new Vector2Int(1, 1), player);
-        //AddObject(new Vector2Int(4, 8), dummy);
     }
-    private Node[,] CreateGrid()
+    private void Update()
     {
-        Node[,] _grid = new Node[gridSize.x, gridSize.y];
+        if (!unwalkablesUpdated)
+            StartCoroutine(updateUnwalkables());
+    }
+
+    private void CreateGrid()
+    {
+        grid = new Node[gridSize.x, gridSize.y];
         for (int y = 0; y <gridSize.y; y++)
         {
             for (int x = 0; x < gridSize.x; x++)
@@ -53,10 +56,10 @@ public class Grid : MonoBehaviour
                     walkable = false;
                 }
 
-                _grid[x, y] = new Node(walkable, worldPoint, new Vector2(x, y));
+                grid[x, y] = new Node(walkable, worldPoint, new Vector2(x, y));
             }
         }
-        return _grid;
+        //return _grid;
     }
 
     private IEnumerator updateUnwalkables()
@@ -73,7 +76,8 @@ public class Grid : MonoBehaviour
                 grid[x, y].setWalkable(walkable);
             }
         }
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(5f);
+        unwalkablesUpdated = true;
         yield return null;
     }
 
