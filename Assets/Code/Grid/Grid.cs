@@ -14,6 +14,8 @@ public class Grid : MonoBehaviour
     [SerializeField] private GameObject dummy;
     [SerializeField] private GameObject testObject;
 
+    private Queue generatorQueue = new Queue();
+
     private worldGenerator worldGenerator;
     private Node[,] grid;
     private Vector3 worldBottomLeft;
@@ -23,19 +25,23 @@ public class Grid : MonoBehaviour
         worldBottomLeft = transform.position - Vector3.right * gridSize.x / 2 - Vector3.forward * gridSize.y / 2;
         worldGenerator = GetComponent<worldGenerator>();
 
-        tiles = worldGenerator.GenerateWorld(gridSize, worldBottomLeft, offset);
-        CreateGrid();
+        //tiles = worldGenerator.GenerateWorld(gridSize, worldBottomLeft, offset);
+        //worldGenerator.GenerateCorridors();
 
-        worldGenerator.GenerateCorridors();
+        grid = new Node[gridSize.x, gridSize.y];
 
-        //updateUnwalkables();
+        generatorQueue.Enqueue(tiles = worldGenerator.GenerateWorld(gridSize, worldBottomLeft, offset));
+        generatorQueue.Enqueue(grid = CreateGrid());
+        generatorQueue.Enqueue(worldGenerator.GenerateCorridors());
+        //generatorQueue.Enqueue(AddObject(new Vector2Int(1, 1), player));
+
+       StartCoroutine(updateUnwalkables());
         //AddObject(new Vector2Int(1, 1), player);
         //AddObject(new Vector2Int(4, 8), dummy);
     }
-    private void CreateGrid()
+    private Node[,] CreateGrid()
     {
-        grid = new Node[gridSize.x, gridSize.y];
-
+        Node[,] _grid = new Node[gridSize.x, gridSize.y];
         for (int y = 0; y <gridSize.y; y++)
         {
             for (int x = 0; x < gridSize.x; x++)
@@ -47,12 +53,13 @@ public class Grid : MonoBehaviour
                     walkable = false;
                 }
 
-                grid[x, y] = new Node(walkable, worldPoint, new Vector2(x, y));
+                _grid[x, y] = new Node(walkable, worldPoint, new Vector2(x, y));
             }
         }
+        return _grid;
     }
 
-    private void updateUnwalkables()
+    private IEnumerator updateUnwalkables()
     {
         for (int y = 0; y < gridSize.y; y++)
         {
@@ -66,8 +73,8 @@ public class Grid : MonoBehaviour
                 grid[x, y].setWalkable(walkable);
             }
         }
-        //yield return new WaitForSeconds(1f);
-        //yield return null;
+        yield return new WaitForSeconds(2f);
+        yield return null;
     }
 
     private void AddObject(Vector2Int position, GameObject newGridObject)
