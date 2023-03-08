@@ -192,12 +192,12 @@ public class worldGenerator : MonoBehaviour
     {
         if (pathSucces)
         {
-            Debug.Log("path found");
+            //Debug.Log("path found");
             StartCoroutine(addPath(newPath));
         }
         else
         {
-            Debug.Log("path not found");
+            //Debug.Log("path not found");
         }
     }
 
@@ -372,8 +372,8 @@ public class Room
 
     public Vector2Int randomPosition()
     {
-        int x = Random.Range(leftBottomCorner.x, leftBottomCorner.x + width);
-        int y = Random.Range(leftBottomCorner.y, leftBottomCorner.y + height);
+        int x = Random.Range(leftBottomCorner.x + 1, leftBottomCorner.x + width - 1);
+        int y = Random.Range(leftBottomCorner.y + 1, leftBottomCorner.y + height - 1);
 
         return new Vector2Int(x, y);
     }

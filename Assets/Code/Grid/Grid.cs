@@ -21,9 +21,11 @@ public class Grid : MonoBehaviour
     private Vector3 worldBottomLeft;
 
     private bool unwalkablesUpdated = false;
+    private bool dummyAdded = false;
     private void Start()
     {
         worldBottomLeft = transform.position - Vector3.right * gridSize.x / 2 - Vector3.forward * gridSize.y / 2;
+        Debug.Log("world bottom left" + worldBottomLeft);
         worldGenerator = GetComponent<worldGenerator>();
 
         tiles = worldGenerator.GenerateWorld(gridSize, worldBottomLeft, offset);
@@ -31,6 +33,7 @@ public class Grid : MonoBehaviour
         worldGenerator.GenerateCorridors();
 
         AddObject(worldGenerator.defineStartAndExit(), playerPrefab);
+        //AddObject(worldGenerator.defineStartAndExit(), dummy);
         GameObject player = GameObject.Find("Player(Clone)");
         Camera.main.transform.SetParent(player.transform);
         Camera.main.transform.position = player.transform.position + new Vector3(0, 15, -5);
@@ -78,6 +81,12 @@ public class Grid : MonoBehaviour
         }
         yield return new WaitForSeconds(5f);
         unwalkablesUpdated = true;
+        if (!dummyAdded)
+        {
+            AddObject(worldGenerator.defineStartAndExit(), dummy);
+            dummyAdded = true;
+        }
+        
         yield return null;
     }
 
@@ -119,8 +128,7 @@ public class Grid : MonoBehaviour
     public Vector3 TileIndexFromWorldPoint(Vector3 position)
     {
         int x = (int)(position.x - worldBottomLeft.x);
-        int y = (int)(position.z - worldBottomLeft.y);
-
+        int y = (int)(position.z - worldBottomLeft.z);
         return new Vector3(x, 0, y);
     }
 
@@ -128,7 +136,6 @@ public class Grid : MonoBehaviour
     {
         int x = (int)(worldPosition.x - worldBottomLeft.x);
         int y = (int)(worldPosition.z - worldBottomLeft.z);
-        //Debug.Log(worldPosition.x + ":" + worldPosition.z);
         //Debug.Log(x + ":" + y);
         if (grid[x, y] != null)
             return grid[x, y];

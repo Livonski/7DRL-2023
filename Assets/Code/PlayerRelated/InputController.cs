@@ -7,9 +7,11 @@ using UnityEngine.UIElements;
 public class InputController : MonoBehaviour
 {
     private Movable movable;
+    private MovementSequencer movementSequencer;
     private void Awake()
     {
         movable = GetComponent<Movable>();
+        movementSequencer = FindObjectOfType<MovementSequencer>();
     }
 
     void Update()
@@ -21,7 +23,9 @@ public class InputController : MonoBehaviour
         {
             //Debug.Log(x + " " + y);
             Vector3Int moveDirection = new Vector3Int(x, 0, y);
-            StartCoroutine(movable.Move(moveDirection));
+            movementSequencer.enqueueMove(moveDirection, movable);
+            movementSequencer.startMoving();
+            //StartCoroutine(movable.Move(moveDirection));
         }
     }
 }

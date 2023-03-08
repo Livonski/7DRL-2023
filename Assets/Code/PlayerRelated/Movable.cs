@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -8,11 +9,14 @@ public class Movable : MonoBehaviour
 {
     [SerializeField] private Vector3 currentPosition;
     [SerializeField] private bool moving;
+    private MovementSequencer movementSequencer;
     private Grid grid;
 
     private void Awake()
     {
         grid = FindObjectOfType<Grid>();
+        movementSequencer = FindObjectOfType<MovementSequencer>();
+        movementSequencer.addMovable(this);
     }
 
     public void SetStartPosition(Vector3 startPosition)
@@ -20,13 +24,18 @@ public class Movable : MonoBehaviour
         if (startPosition != null)
             currentPosition = startPosition;
     }
+    public IEnumerator enqueueMove(Vector3 direction)
+    {
+        movementSequencer.enqueueMove(direction, this);
+        yield return null;
+    }
 
     public IEnumerator Move(Vector3 direction)
     {
         if (!moving)
         {
             bool pathClear = true;
-
+            Debug.Log("Current position " + transform.position  + "Direction " + direction);
             GameObject targetTile = grid.GetTile(currentPosition + direction);
             if (targetTile != null)
             {
@@ -36,7 +45,7 @@ public class Movable : MonoBehaviour
 
                 for (int i = 0; i < targetTile.transform.childCount; i++)
                 {
-                    Debug.Log(targetTile.transform.tag);
+                    //Debug.Log(targetTile.transform.tag);
                     if (targetTile.transform.GetChild(i).tag == "Unwalkable" | targetTile.transform.GetChild(i).tag == "Entity")
                     {
                         pathClear = false;
@@ -71,7 +80,7 @@ public class Movable : MonoBehaviour
         if (direction != Vector3.zero)
         {
             //Debug.Log("Current position " + transform.position + "Moving to " + targetPosition + "Direction " + direction + "Tile coordinates " + targetGridPosition);
-            StartCoroutine(Move(direction));
+            StartCoroutine(enqueueMove(direction));
         }
 
 
